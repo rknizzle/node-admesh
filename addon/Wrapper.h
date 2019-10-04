@@ -22,6 +22,7 @@ class Wrapper : public Napi::ObjectWrap<Wrapper> {
   Napi::Value open(const Napi::CallbackInfo& info);
   Napi::Value write(const Napi::CallbackInfo& info);
   Napi::Value repair(const Napi::CallbackInfo& info);
+  Napi::Value getProperties(const Napi::CallbackInfo& info);
 
   // STL instance
   stl_file stl;

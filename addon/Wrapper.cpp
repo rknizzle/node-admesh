@@ -17,7 +17,8 @@ Napi::Object Wrapper::Init(Napi::Env env, Napi::Object exports) {
   Napi::Function func = DefineClass(env, "Mesh", {
     InstanceMethod("open", &Wrapper::open),
     InstanceMethod("write", &Wrapper::write),
-    InstanceMethod("repair", &Wrapper::repair)
+    InstanceMethod("repair", &Wrapper::repair),
+    InstanceAccessor("properties", &Wrapper::getProperties, nullptr)
   });
 
   constructor = Napi::Persistent(func);
@@ -121,4 +122,17 @@ bool Wrapper::has_mesh_data() {
     return true;
   }
   return false;
+}
+
+Napi::Value Wrapper::getProperties(const Napi::CallbackInfo& info) {
+  Napi::Object props = Napi::Object::New(info.Env());
+  props.Set("numberOfParts", stl.stats.number_of_parts);
+  props.Set("facetsAdded", stl.stats.facets_added);
+  props.Set("facetsRemoved", stl.stats.facets_removed);
+  props.Set("degenerateFacets", stl.stats.degenerate_facets);
+  props.Set("edgesFixed", stl.stats.edges_fixed);
+  props.Set("facetsReversed", stl.stats.facets_reversed);
+  props.Set("backwardsEdges", stl.stats.backwards_edges);
+  props.Set("normalsFixed", stl.stats.normals_fixed);
+  return props;
 }
