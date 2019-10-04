@@ -88,7 +88,7 @@ stl_count_facets(stl_file *stl, char *file) {
                 malloc(81 + strlen(file)); /* Allow 80 chars+file size for message */
     sprintf(error_msg, "stl_initialize: Couldn't open %s for reading",
             file);
-    perror(error_msg);
+    stl->error_msg = error_msg;
     free(error_msg);
     stl->error = 1;
     return;
@@ -100,7 +100,7 @@ stl_count_facets(stl_file *stl, char *file) {
   /* Check for binary or ASCII file */
   fseek(stl->fp, HEADER_SIZE, SEEK_SET);
   if (!fread(chtest, sizeof(chtest), 1, stl->fp)) {
-    perror("The input is an empty file");
+    stl->error_msg = "The input is an empty file";
     stl->error = 1;
     return;
   }
@@ -140,7 +140,7 @@ stl_count_facets(stl_file *stl, char *file) {
   else {
     /* Reopen the file in text mode (for getting correct newlines on Windows) */
     if (freopen(file, "r", stl->fp) == NULL) {
-      perror("Could not reopen the file, something went wrong");
+      stl->error_msg = "Could not reopen the file, something went wrong";
       stl->error = 1;
       return;
     }
@@ -290,7 +290,7 @@ stl_read(stl_file *stl, int first_facet, int first) {
     {
       if(fread(facet_buffer, sizeof(facet_buffer), 1, stl->fp)
          + fread(&facet.extra, sizeof(char), 2, stl->fp) != 3) {
-        perror("Cannot read facet");
+        stl->error_msg = "Cannot read facet";
         stl->error = 1;
         return;
       }
@@ -311,7 +311,7 @@ stl_read(stl_file *stl, int first_facet, int first) {
           fscanf(stl->fp, "%*s %f %f %f\n", &facet.vertex[2].x, &facet.vertex[2].y,  &facet.vertex[2].z) + \
           fscanf(stl->fp, "%*s") + \
           fscanf(stl->fp, "%*s")) != 12) {
-        perror("Something is syntactically very wrong with this ASCII STL!");
+        stl->error_msg = "Something is syntactically very wrong with this ASCII STL!";
         stl->error = 1;
         return;
       }

@@ -155,7 +155,7 @@ stl_write_off(stl_file *stl, char *file) {
                 malloc(81 + strlen(file)); /* Allow 80 chars+file size for message */
     sprintf(error_msg, "stl_write_ascii: Couldn't open %s for writing",
             file);
-    perror(error_msg);
+    stl->error_msg = error_msg;
     free(error_msg);
     stl->error = 1;
     return;
@@ -191,7 +191,7 @@ stl_write_vrml(stl_file *stl, char *file) {
                 malloc(81 + strlen(file)); /* Allow 80 chars+file size for message */
     sprintf(error_msg, "stl_write_ascii: Couldn't open %s for writing",
             file);
-    perror(error_msg);
+    stl->error_msg = error_msg;
     free(error_msg);
     stl->error = 1;
     return;
@@ -245,7 +245,7 @@ void stl_write_obj (stl_file *stl, char *file) {
   if (fp == NULL) {
     char* error_msg = (char*)malloc(81 + strlen(file)); /* Allow 80 chars+file size for message */
     sprintf(error_msg, "stl_write_ascii: Couldn't open %s for writing", file);
-    perror(error_msg);
+    stl->error_msg = error_msg;
     free(error_msg);
     stl->error = 1;
     return;

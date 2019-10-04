@@ -133,6 +133,7 @@ typedef struct {
   stl_vertex    *v_shared;
   stl_stats     stats;
   char          error;
+  char          *error_msg;
 } stl_file;
 
 
