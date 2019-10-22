@@ -11,6 +11,7 @@ class RepairFileAsyncWorker : public Napi::AsyncWorker
     void Execute();
     void OnOK();
     void OnError(const Napi::Error& e);
+    Napi::Value getRepairProperties();
   private:
     Napi::Promise::Deferred deferred;
     stl_file *stl;

@@ -55,8 +55,21 @@ void RepairFileAsyncWorker::OnError(const Napi::Error& e) {
 void RepairFileAsyncWorker::OnOK() {
   Napi::HandleScope scope(Env());
   // value to return
-  deferred.Resolve(Napi::Boolean::New(Env(), true));
+  deferred.Resolve(getRepairProperties());
 
   // Call empty function
   Callback().Call({});
+}
+
+Napi::Value RepairFileAsyncWorker::getRepairProperties() {
+  Napi::Object props = Napi::Object::New(Env());
+  props.Set("numberOfParts", stl->stats.number_of_parts);
+  props.Set("facetsAdded", stl->stats.facets_added);
+  props.Set("facetsRemoved", stl->stats.facets_removed);
+  props.Set("degenerateFacets", stl->stats.degenerate_facets);
+  props.Set("edgesFixed", stl->stats.edges_fixed);
+  props.Set("facetsReversed", stl->stats.facets_reversed);
+  props.Set("backwardsEdges", stl->stats.backwards_edges);
+  props.Set("normalsFixed", stl->stats.normals_fixed);
+  return props;
 }
