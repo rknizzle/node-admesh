@@ -127,12 +127,8 @@ bool Wrapper::has_mesh_data() {
 Napi::Value Wrapper::getProperties(const Napi::CallbackInfo& info) {
   Napi::Object props = Napi::Object::New(info.Env());
   props.Set("numberOfParts", stl.stats.number_of_parts);
-  props.Set("facetsAdded", stl.stats.facets_added);
-  props.Set("facetsRemoved", stl.stats.facets_removed);
-  props.Set("degenerateFacets", stl.stats.degenerate_facets);
-  props.Set("edgesFixed", stl.stats.edges_fixed);
-  props.Set("facetsReversed", stl.stats.facets_reversed);
-  props.Set("backwardsEdges", stl.stats.backwards_edges);
-  props.Set("normalsFixed", stl.stats.normals_fixed);
+  props.Set("NumerOfFacets", stl.stats.number_of_facets);
+  props.Set("volume", stl.stats.volume);
+  props.Set("surfaceArea", stl.stats.surface_area);
   return props;
 }
