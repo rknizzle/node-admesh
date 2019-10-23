@@ -18,6 +18,8 @@ Napi::Object Wrapper::Init(Napi::Env env, Napi::Object exports) {
     InstanceMethod("open", &Wrapper::open),
     InstanceMethod("write", &Wrapper::write),
     InstanceMethod("repair", &Wrapper::repair),
+    InstanceMethod("scale", &Wrapper::scale),
+    InstanceMethod("rotate", &Wrapper::rotate),
     InstanceAccessor("properties", &Wrapper::getProperties, nullptr)
   });
 
@@ -117,6 +119,70 @@ Napi::Value Wrapper::repair(const Napi::CallbackInfo& info) {
   return deferred.Promise();
 }
 
+// scale mesh
+Napi::Value Wrapper::scale(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  Napi::HandleScope scope(env);
+  Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(info.Env());
+  Napi::Function callback = Napi::Function::New(env, EmptyCallback);
+
+  int length = info.Length();
+  Napi::Number factor;
+
+  if (length > 0 && info[0].IsNumber()) {
+    factor = info[0].As<Napi::Number>();
+  }
+  else {
+    deferred.Reject(Napi::String::New(Env(), "Missing scaling factor value"));
+    return deferred.Promise();
+  }
+
+  if (!has_mesh_data()) {
+    deferred.Reject(Napi::String::New(Env(), "No mesh data to scale"));
+    return deferred.Promise();
+  }
+
+
+  // create async worker for scale function
+  ScaleAsyncWorker *worker = new ScaleAsyncWorker(callback, deferred, &stl, factor);
+  worker->Queue();
+
+  return deferred.Promise();
+}
+
+// rotate mesh
+Napi::Value Wrapper::rotate(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  Napi::HandleScope scope(env);
+  Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(info.Env());
+  Napi::Function callback = Napi::Function::New(env, EmptyCallback);
+
+  int length = info.Length();
+  Napi::String axis;
+  Napi::Number angle;
+
+  if (length == 2 && info[0].IsString() && info[1].IsNumber()) {
+    axis = info[0].As<Napi::String>();
+    angle = info[1].As<Napi::Number>();
+  }
+  else {
+    deferred.Reject(Napi::String::New(Env(), "Incorrect rotation arguments specified. Choose axis and angle."));
+    return deferred.Promise();
+  }
+
+  if (!has_mesh_data()) {
+    deferred.Reject(Napi::String::New(Env(), "No mesh data to rotate"));
+    return deferred.Promise();
+  }
+
+  std::string axisString = std::string(axis);
+  // create async worker for rotate function
+  RotateAsyncWorker *worker = new RotateAsyncWorker(callback, deferred, &stl, axisString, angle);
+  worker->Queue();
+
+  return deferred.Promise();
+}
+
 bool Wrapper::has_mesh_data() {
   if (stl.stats.number_of_facets > 0) {
     return true;
@@ -127,7 +193,7 @@ bool Wrapper::has_mesh_data() {
 Napi::Value Wrapper::getProperties(const Napi::CallbackInfo& info) {
   Napi::Object props = Napi::Object::New(info.Env());
   props.Set("numberOfParts", stl.stats.number_of_parts);
-  props.Set("NumerOfFacets", stl.stats.number_of_facets);
+  props.Set("numberOfFacets", stl.stats.number_of_facets);
   props.Set("volume", stl.stats.volume);
   props.Set("surfaceArea", stl.stats.surface_area);
   return props;

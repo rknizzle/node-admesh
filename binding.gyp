@@ -9,6 +9,8 @@
             "addon/OpenFileAsyncWorker.cpp",
             "addon/WriteFileAsyncWorker.cpp",
             "addon/RepairFileAsyncWorker.cpp",
+            "addon/ScaleAsyncWorker.cpp",
+            "addon/RotateAsyncWorker.cpp",
             "src/connect.c",
             "src/normals.c",
             "src/shared.c",
