@@ -7,6 +7,7 @@
 #include "OpenFileAsyncWorker.h"
 #include "RepairFileAsyncWorker.h"
 #include "ScaleAsyncWorker.h"
+#include "RotateAsyncWorker.h"
 
 
 class Wrapper : public Napi::ObjectWrap<Wrapper> {
@@ -24,6 +25,7 @@ class Wrapper : public Napi::ObjectWrap<Wrapper> {
   Napi::Value write(const Napi::CallbackInfo& info);
   Napi::Value repair(const Napi::CallbackInfo& info);
   Napi::Value scale(const Napi::CallbackInfo& info);
+  Napi::Value rotate(const Napi::CallbackInfo& info);
   Napi::Value getProperties(const Napi::CallbackInfo& info);
 
   // STL instance
