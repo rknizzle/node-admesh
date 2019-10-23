@@ -193,7 +193,7 @@ bool Wrapper::has_mesh_data() {
 Napi::Value Wrapper::getProperties(const Napi::CallbackInfo& info) {
   Napi::Object props = Napi::Object::New(info.Env());
   props.Set("numberOfParts", stl.stats.number_of_parts);
-  props.Set("NumerOfFacets", stl.stats.number_of_facets);
+  props.Set("numberOfFacets", stl.stats.number_of_facets);
   props.Set("volume", stl.stats.volume);
   props.Set("surfaceArea", stl.stats.surface_area);
   return props;
