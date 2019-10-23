@@ -18,6 +18,7 @@ Napi::Object Wrapper::Init(Napi::Env env, Napi::Object exports) {
     InstanceMethod("open", &Wrapper::open),
     InstanceMethod("write", &Wrapper::write),
     InstanceMethod("repair", &Wrapper::repair),
+    InstanceMethod("scale", &Wrapper::scale),
     InstanceAccessor("properties", &Wrapper::getProperties, nullptr)
   });
 
@@ -112,6 +113,37 @@ Napi::Value Wrapper::repair(const Napi::CallbackInfo& info) {
 
   // create async worker for stl_repair function
   RepairFileAsyncWorker *worker = new RepairFileAsyncWorker(callback, deferred, &stl);
+  worker->Queue();
+
+  return deferred.Promise();
+}
+
+// scale mesh
+Napi::Value Wrapper::scale(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  Napi::HandleScope scope(env);
+  Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(info.Env());
+  Napi::Function callback = Napi::Function::New(env, EmptyCallback);
+
+  int length = info.Length();
+  Napi::Number factor;
+
+  if (length > 0 && info[0].IsNumber()) {
+    factor = info[0].As<Napi::Number>();
+  }
+  else {
+    deferred.Reject(Napi::String::New(Env(), "Missing scaling factor value"));
+    return deferred.Promise();
+  }
+
+  if (!has_mesh_data()) {
+    deferred.Reject(Napi::String::New(Env(), "No mesh data to scale"));
+    return deferred.Promise();
+  }
+
+
+  // create async worker for stl_repair function
+  ScaleAsyncWorker *worker = new ScaleAsyncWorker(callback, deferred, &stl, factor);
   worker->Queue();
 
   return deferred.Promise();
